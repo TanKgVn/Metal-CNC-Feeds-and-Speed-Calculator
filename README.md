@@ -18,10 +18,6 @@ A web-based feeds and speeds calculator designed for the **Genmitsu PROVer MAX 3
 ![Calculation Results](screenshots/results-display.png)
 *Example calculation results with safety warnings*
 
-<!-- Mobile View -->
-![Mobile Responsive](screenshots/mobile-view.png)
-*Responsive design works on all devices*
-
 ---
 
 ## 🎯 Purpose
@@ -343,7 +339,7 @@ MIT License - See [LICENSE](LICENSE) file for details
 ```
 MIT License
 
-Copyright (c) 2025 Tan Nguyen
+Copyright (c) 2025 Tan Chau
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -354,13 +350,13 @@ in the Software without restriction...
 
 ## 👨‍💻 Author
 
-**Tan Nguyen**  
+**Tan Chau**  
 Makerspace Associate, Mason Innovation Exchange (MIX) Fabrication Lab  
 George Mason University
 
-- **Email:** YOUR_EMAIL@example.com
-- **LinkedIn:** [Your LinkedIn](https://linkedin.com/in/YOUR_PROFILE)
-- **Portfolio:** [Your Website](https://yourwebsite.com)
+- **Email:** minten2806@gmail.com
+- **LinkedIn:** [Minh Tan Chau](https://www.linkedin.com/in/minh-tan-chau/)
+- **Portfolio:** [Tan Chau - Mechanical Engineer & Fabrication Specialist](https://tanchau.me)
 - **YouTube:** [@TenGineerin9](https://youtube.com/@TenGineerin9)
 
 ---
@@ -400,44 +396,21 @@ This calculator provides **recommendations only**.
 ## 📚 Additional Resources
 
 ### Learning CNC Machining
-- [CNC Cookbook - Feeds & Speeds](https://www.cnccookbook.com/feeds-speeds-cnc-cut/)
-- [Fusion 360 CAM Tutorials](https://help.autodesk.com/view/fusion360/ENU/courses/)
-- [Tormach Machining Training](https://www.tormach.com/machines/education)
+- [CNC Cookbook - Feeds & Speeds Guide](https://www.cnccookbook.com/feeds-speeds-basic-cnc-tutorial/)
+- [MIT Machine Shop - CNC Training](https://studentshops.mit.edu/machine-shop/)
+- [NYC CNC - YouTube Channel](https://www.youtube.com/@nycCNC)
+- [Haas Automation - CNC Training](https://www.haascnc.com/education.html)
 
 ### VCarve Pro Resources
-- [VCarve Pro Documentation](https://www.vectric.com/support/tutorials)
-- [VCarve Pro Video Tutorials](https://www.vectric.com/support/video-tutorials)
+- [VCarve Pro Official Documentation](https://help.vectric.com/docs/V11.5/VCarvePro/ENU/Help/VCarve%20Pro.htm)
+- [Vectric YouTube Channel](https://www.youtube.com/@VectricLtd)
 
 ### Genmitsu Resources
-- [PROVer MAX User Manual](https://www.sainsmart.com/products/genmitsu-prover-max-3030)
-- [SainSmart Support](https://www.sainsmart.com/pages/support)
+- [Genmitsu PROVer MAX Product Page](https://www.sainsmart.com/products/genmitsu-prover-max-3030)
+- [SainSmart Knowledge Base](https://www.sainsmart.com/pages/knowledge-base)
 
 ---
 
-## 🌟 Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=YOUR_USERNAME/metal-cnc-calculator&type=Date)](https://star-history.com/#YOUR_USERNAME/metal-cnc-calculator&Date)
-
----
-
-## 📊 Repository Stats
-
-![GitHub repo size](https://img.shields.io/github/repo-size/YOUR_USERNAME/metal-cnc-calculator)
-![GitHub code size](https://img.shields.io/github/languages/code-size/YOUR_USERNAME/metal-cnc-calculator)
-![Lines of code](https://img.shields.io/tokei/lines/github/YOUR_USERNAME/metal-cnc-calculator)
-![GitHub last commit](https://img.shields.io/github/last-commit/YOUR_USERNAME/metal-cnc-calculator)
-
----
-
-**Made with ❤️ for MIX Workshop by Tan**
+**Made with ❤️ for MIX Workshop by Tan Chau**
 
 `Genmitsu PROVer MAX 3030 | Carbide Compact Router (CCR) | VCarve Pro | Candle`
-
----
-
-### Quick Links
-
-- [📖 Documentation](#-usage)
-- [🐛 Report Bug](https://github.com/YOUR_USERNAME/metal-cnc-calculator/issues)
-- [💡 Request Feature](https://github.com/YOUR_USERNAME/metal-cnc-calculator/issues)
-- [⭐ Star this repo](https://github.com/YOUR_USERNAME/metal-cnc-calculator)
