@@ -13,13 +13,13 @@ A web-based feeds and speeds calculator designed for the **Genmitsu PROVer MAX 3
 <!-- Main Interface -->
 <img width="842" height="1012" alt="image" src="https://github.com/user-attachments/assets/1b260398-b3da-4712-b5e5-ca8aa22fafe7" />
 
-)
+
 *Main calculator interface with material and operation selection*
 
 <!-- Results Display -->
 <img width="850" height="963" alt="image" src="https://github.com/user-attachments/assets/7428cf88-438f-4a25-a4d0-9f91670b7e7f" />
 
-)
+
 *Example calculation results with safety warnings*
 
 ---
