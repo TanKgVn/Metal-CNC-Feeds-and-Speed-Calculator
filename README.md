@@ -356,7 +356,7 @@ George Mason University
 
 - **Email:** minten2806@gmail.com
 - **LinkedIn:** [Minh Tan Chau](https://www.linkedin.com/in/minh-tan-chau/)
-- **Portfolio:** [Tan Chau - Mechanical Engineer & Fabrication Specialist](https://tanchau.me)
+- **Portfolio:** [Tan Chau - Mechanical Engineer & Fabrication Specialist](https://tankgvn.github.io/)
 - **YouTube:** [@TenGineerin9](https://youtube.com/@TenGineerin9)
 
 ---
