@@ -1,0 +1,1473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Genmitsu Metal Feeds & Speeds Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #0a0a0a;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #1a1a1a;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            overflow: hidden;
+            border: 1px solid #2a2a2a;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #1a1a1a 0%, #0f0f0f 100%);
+            color: #ffffff;
+            padding: 30px;
+            text-align: center;
+            border-bottom: 2px solid #ff6b35;
+        }
+        
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            opacity: 0.9;
+            font-size: 1em;
+        }
+        
+        .main-content {
+            padding: 30px;
+        }
+        
+        .input-section {
+            background: #0f0f0f;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            border: 1px solid #2a2a2a;
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-group label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #ff6b35;
+            font-size: 0.95em;
+        }
+        
+        .input-group select,
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #2a2a2a;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s;
+            background: #1a1a1a;
+            color: #ffffff;
+        }
+        
+        .input-group select:focus,
+        .input-group input:focus {
+            outline: none;
+            border-color: #ff6b35;
+        }
+
+        .input-helper {
+            font-size: 0.85em;
+            color: #888;
+            margin-top: 5px;
+        }
+        
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        
+        .calculate-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #ff6b35 0%, #ff8c42 100%);
+            color: #0a0a0a;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(255, 107, 53, 0.4);
+        }
+        
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+        
+        .toggle-custom {
+            background: #ff6b35;
+            color: #0a0a0a;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 15px;
+            font-weight: 600;
+            width: 100%;
+        }
+        
+        .toggle-custom:hover {
+            background: #ff8c42;
+        }
+        
+        .results-section {
+            background: #0f0f0f;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            display: none;
+            border: 1px solid #2a2a2a;
+        }
+        
+        .results-section.show {
+            display: block;
+            animation: slideIn 0.5s ease;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .result-card {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+            border: 1px solid #2a2a2a;
+        }
+        
+        .result-card h3 {
+            color: #ff6b35;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .result-card .value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #ffffff;
+        }
+        
+        .result-card .unit {
+            font-size: 0.9em;
+            color: #888888;
+            margin-left: 5px;
+        }
+        
+        .warning {
+            background: #2a1f00;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            color: #ffeb3b;
+        }
+        
+        .info-box {
+            background: #2a1a00;
+            border-left: 4px solid #ff6b35;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            color: #ffaa77;
+        }
+        
+        .formula-section {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 2px solid #2a2a2a;
+        }
+        
+        .formula-section h3 {
+            color: #ffffff;
+            margin-bottom: 15px;
+        }
+        
+        .formula {
+            background: #0f0f0f;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 10px 0;
+            border-left: 3px solid #ff6b35;
+            color: #cccccc;
+        }
+        
+        .bit-info {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid #2a2a2a;
+        }
+        
+        .bit-info p {
+            margin: 5px 0;
+            color: #cccccc;
+        }
+        
+        .custom-override {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border: 2px solid #ff6b35;
+            display: none;
+        }
+        
+        .custom-override.show {
+            display: block;
+        }
+        
+        .custom-override h3 {
+            color: #ff6b35;
+            margin-bottom: 15px;
+        }
+        
+        .footer {
+            background: #0f0f0f;
+            color: #888888;
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9em;
+            border-top: 2px solid #ff6b35;
+        }
+        
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 1.5em;
+            }
+            
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔧 CNC Feeds & Speeds Calculator</h1>
+            <p>Genmitsu PROVer MAX 3030 | Carbide Compact Router (CCR) | VCarve Pro | Candle</p>
+        </div>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <h2 style="margin-bottom: 20px; color: #ffffff;">Input Parameters</h2>
+                
+                <div class="input-group">
+                    <label for="spindle-dial">Spindle Dial Setting (Set Manually on Router)</label>
+                    <select id="spindle-dial">
+                        <option value="10000">Dial 1 → 10,000 RPM</option>
+                        <option value="12000">Dial 1.5 → 12,000 RPM</option>
+                        <option value="14000">Dial 2 → 14,000 RPM</option>
+                        <option value="16000">Dial 2.5 → 16,000 RPM</option>
+                        <option value="18000" selected>Dial 3 → 18,000 RPM</option>
+                        <option value="20500">Dial 3.5 → 20,500 RPM</option>
+                        <option value="23000">Dial 4 → 23,000 RPM</option>
+                        <option value="25000">Dial 4.5 → 25,000 RPM</option>
+                        <option value="27000">Dial 5 → 27,000 RPM</option>
+                        <option value="29500">Dial 5.5 → 29,500 RPM</option>
+                        <option value="32000">Dial 6 → 32,000 RPM</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="material">Material</label>
+                    <select id="material">
+                        <option value="" selected disabled>-- Select Material --</option>
+                        <option value="aluminum6061">Aluminum 6061</option>
+                        <option value="polycarbonate">Polycarbonate</option>
+                        <option value="brass">Brass</option>
+                        <option value="copper">Copper</option>
+                        <option value="mildsteel">Mild Steel</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="operation">Operation Type</label>
+                    <select id="operation">
+                        <option value="" selected disabled>-- Select Operation Type --</option>
+                        <option value="contour-profiling">Contour Profiling (Outside/Inside Profile)</option>
+                        <option value="slotting">Slotting (Full Width Cut)</option>
+                        <option value="pocketing">Pocketing (Adaptive Clearing)</option>
+                        <option value="3d-roughing">3D Roughing (3D Model Clearing)</option>
+                        <option value="3d-finishing">3D Finishing (3D Surface Detail)</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label for="bit-type">Bit Type</label>
+                    <select id="bit-type">
+                        <option value="" selected disabled>-- Select Bit Type --</option>
+                        <option value="endmill">Flat End Mill</option>
+                        <option value="ballnose">Ball Nose</option>
+                        <option value="vbit">V-Bit / Engraving</option>
+                        <option value="roughing">Roughing End Mill (Corn Cob)</option>
+                    </select>
+                </div>
+
+                <div class="two-column">
+                    <div class="input-group">
+                        <label for="tool-diameter">Tool Diameter</label>
+                        <select id="tool-diameter">
+                            <option value="" selected disabled>-- Select Tool Size --</option>
+                            <option value="0.0625">1/16" (0.0625")</option>
+                            <option value="0.125">1/8" (0.125")</option>
+                            <option value="0.1875">3/16" (0.1875")</option>
+                            <option value="0.25">1/4" (0.25")</option>
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <label for="flutes">Number of Flutes</label>
+                        <select id="flutes">
+                            <option value="" selected disabled>-- Select Flutes --</option>
+                            <option value="1">1 Flute</option>
+                            <option value="2">2 Flutes</option>
+                            <option value="3">3 Flutes</option>
+                            <option value="4">4 Flutes</option>
+                        </select>
+                        <div class="input-helper" id="flutes-helper"></div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="chipload">Target Chipload (inches per tooth)</label>
+                    <input type="number" id="chipload" value="" placeholder="e.g., 0.001" step="0.0001" min="0.0001" max="0.01">
+                    <div class="input-helper" id="chipload-recommendation"></div>
+                </div>
+
+                <div class="two-column" id="depth-stepover-container">
+                    <div class="input-group" id="total-depth-container">
+                        <label for="total-depth">Total Cut Depth</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="number" id="total-depth" value="" placeholder="e.g., 1.5" step="0.001" min="0.001" max="25.4" style="flex: 1;">
+                            <select id="depth-unit" style="width: 80px;">
+                                <option value="mm" selected>mm</option>
+                                <option value="in">inches</option>
+                            </select>
+                        </div>
+                        <div class="input-helper">Total depth you want to cut into the material</div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label for="plunge-factor">Plunge Rate Factor (%)</label>
+                    <input type="number" id="plunge-factor" value="" placeholder="25" step="5" min="10" max="50">
+                    <div class="input-helper">Plunge rate = Feed rate × this factor (default: 25%)</div>
+                </div>
+                
+                <button class="calculate-btn" onclick="calculate()">Calculate Feeds & Speeds</button>
+                <button class="toggle-custom" onclick="toggleCustom()">Toggle Custom Calculator</button>
+            </div>
+            
+            <div class="results-section" id="results">
+                <h2 style="margin-bottom: 15px; color: #ffffff;">📊 Calculated Results</h2>
+                
+                <div class="bit-info" id="bitInfo"></div>
+                
+                <div class="results-grid" id="resultsGrid"></div>
+                
+                <div id="warnings"></div>
+                
+                <div class="formula-section">
+                    <h3>📐 Formulas Used</h3>
+                    <div class="formula">
+                        <strong>Feed Rate (in/min)</strong> = RPM × Number of Flutes × Chipload
+                    </div>
+                    <div class="formula">
+                        <strong>Plunge Rate (in/min)</strong> = Feed Rate × Plunge Factor
+                    </div>
+                    <div class="formula">
+                        <strong>Stepover Distance (in)</strong> = Tool Diameter × (Stepover % / 100)
+                    </div>
+                    <div class="formula">
+                        <strong>Ramp Distance (in)</strong> = Depth of Cut / tan(Ramp Angle)
+                    </div>
+                    <div class="formula">
+                        <strong>Material Removal Rate (in³/min)</strong> = Feed Rate × Depth of Cut × Stepover Distance
+                    </div>
+                    
+                    <div style="margin-top: 20px; padding: 15px; background: #2a1a00; border-left: 4px solid #ff6b35; border-radius: 5px;">
+                        <h4 style="color: #ff6b35; margin-bottom: 10px;">Understanding Depth of Cut (DOC)</h4>
+                        <p style="color: #ffaa77; line-height: 1.6; margin-bottom: 10px;">
+                            <strong>DOC = Tool Dia × Material Factor × Operation Factor × Bit Type Factor</strong>
+                        </p>
+                        <p style="color: #cccccc; font-size: 0.9em; line-height: 1.6;">
+                            Calculator determines safe DOC and splits your total depth into multiple passes. Example: 0.060" total ÷ 0.015" per pass = 4 passes.
+                        </p>
+                        <p style="margin-top: 8px; color: #ffc107; font-size: 0.85em;">
+                            ⚠️ Multiple shallow passes are safer than one deep cut. Always test in scrap first.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="custom-override" id="customOverride">
+                <h3>⚙️ Custom Calculator</h3>
+                <p style="margin-bottom: 15px; color: #888888;">Override standard recommendations with your own parameters:</p>
+                
+                <div class="input-group">
+                    <label for="custom-rpm">Custom RPM</label>
+                    <select id="custom-rpm">
+                        <option value="10000">Dial 1 → 10,000 RPM</option>
+                        <option value="12000">Dial 1.5 → 12,000 RPM</option>
+                        <option value="14000">Dial 2 → 14,000 RPM</option>
+                        <option value="16000">Dial 2.5 → 16,000 RPM</option>
+                        <option value="18000" selected>Dial 3 → 18,000 RPM</option>
+                        <option value="20500">Dial 3.5 → 20,500 RPM</option>
+                        <option value="23000">Dial 4 → 23,000 RPM</option>
+                        <option value="25000">Dial 4.5 → 25,000 RPM</option>
+                        <option value="27000">Dial 5 → 27,000 RPM</option>
+                        <option value="29500">Dial 5.5 → 29,500 RPM</option>
+                        <option value="32000">Dial 6 → 32,000 RPM</option>
+                    </select>
+                </div>
+
+                <div class="two-column">
+                    <div class="input-group">
+                        <label for="custom-chipload">Custom Chipload (in/tooth)</label>
+                        <input type="number" id="custom-chipload" step="0.0001" placeholder="e.g., 0.0020">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="custom-flutes">Number of Flutes</label>
+                        <input type="number" id="custom-flutes" step="1" placeholder="e.g., 2">
+                    </div>
+                </div>
+                
+                <div class="two-column">
+                    <div class="input-group">
+                        <label for="custom-depth">Depth per Pass (inches)</label>
+                        <input type="number" id="custom-depth" step="0.001" placeholder="e.g., 0.020">
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="custom-stepover">Stepover (%)</label>
+                        <input type="number" id="custom-stepover" step="1" placeholder="e.g., 50">
+                    </div>
+                </div>
+                
+                <button class="calculate-btn" onclick="customCalculate()" style="margin-top: 15px;">Calculate Custom Settings</button>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Made for MIX Workshop by Tan | Genmitsu PROVer MAX 3030 | Carbide Compact Router (CCR) | VCarve Pro | Candle</p>
+            <p style="margin-top: 10px; font-size: 0.85em; opacity: 0.8;">
+                ⚠️ These are recommendation settings. Always make test cuts in scrap material before cutting your final piece.
+            </p>
+        </div>
+    </div>
+    
+    <script>
+        // Bit type characteristics and multipliers
+        const bitTypes = {
+            endmill: {
+                name: "Flat End Mill",
+                chiploadMultiplier: 1.0,
+                depthMultiplier: 1.0,
+                feedMultiplier: 1.0,
+                notes: "Standard choice for most operations. Good all-around performance.",
+                suitableOps: ["contour-profiling", "slotting", "pocketing", "3d-roughing", "3d-finishing"]
+            },
+            ballnose: {
+                name: "Ball Nose",
+                chiploadMultiplier: 0.85,
+                depthMultiplier: 0.75,
+                feedMultiplier: 0.9,
+                notes: "Used for 3D contours and curved surfaces. Effective cutting diameter is smaller at shallow depths. Reduce chipload by 15%.",
+                suitableOps: ["3d-finishing", "pocketing", "contour-profiling"]
+            },
+            vbit: {
+                name: "V-Bit / Engraving",
+                chiploadMultiplier: 0.7,
+                depthMultiplier: 0.5,
+                feedMultiplier: 0.8,
+                notes: "For engraving, chamfering, and decorative work. Very small contact area - use conservative feeds. Multiple light passes recommended.",
+                suitableOps: ["contour-profiling", "3d-finishing"]
+            },
+            roughing: {
+                name: "Roughing End Mill",
+                chiploadMultiplier: 1.2,
+                depthMultiplier: 1.3,
+                feedMultiplier: 1.1,
+                notes: "Serrated 'corn cob' style for aggressive material removal. Despite having many serrations, treat as a 1-flute tool in calculations because the serrations break chips rather than create multiple cutting edges. Excellent chip breaking capability allows 20-30% more aggressive cuts than standard end mills.",
+                suitableOps: ["pocketing", "3d-roughing", "slotting"]
+            }
+        };
+
+        // Material database with chipload ranges and recommendations per operation type
+        const materials = {
+            aluminum6061: {
+                name: "Aluminum 6061",
+                'contour-profiling': {
+                    chiploadMin: 0.0008,
+                    chiploadMax: 0.0012,
+                    recommendedChipload: 0.001,
+                    depthFactor: 0.22,
+                    stepoverPercent: 50,
+                    rampAngle: 3
+                },
+                slotting: {
+                    chiploadMin: 0.0008,
+                    chiploadMax: 0.001,
+                    recommendedChipload: 0.0009,
+                    depthFactor: 0.18,
+                    stepoverPercent: 100,
+                    rampAngle: 2
+                },
+                pocketing: {
+                    chiploadMin: 0.0008,
+                    chiploadMax: 0.0012,
+                    recommendedChipload: 0.001,
+                    // Flute-based depth and stepover
+                    depthFactorByFlutes: {
+                        1: 0.175,  // 15-20% range, default 17.5%
+                        2: 0.20,   // 15-25% range, default 20%
+                        3: 0.15,   // 10-20% range, default 15%
+                        4: 0.10    // 5-15% range, default 10%
+                    },
+                    stepoverPercentByFlutes: {
+                        1: 25,     // 20-30% range, default 25%
+                        2: 20,     // 15-25% range, default 20%
+                        3: 15,     // 10-20% range, default 15%
+                        4: 10      // 5-15% range, default 10%
+                    },
+                    depthFactor: 0.2,  // fallback
+                    stepoverPercent: 20,  // fallback
+                    rampAngle: 3
+                },
+                roughing: {
+                    chiploadMin: 0.0008,
+                    chiploadMax: 0.0012,
+                    recommendedChipload: 0.001,
+                    depthFactor: 0.25,
+                    stepoverPercent: 50,
+                    rampAngle: 2
+                },
+                finishing: {
+                    chiploadMin: 0.0008,
+                    chiploadMax: 0.0012,
+                    recommendedChipload: 0.001,
+                    depthFactor: 0.15,
+                    stepoverPercent: 15,
+                    rampAngle: 5
+                },
+                '3d-roughing': {
+                    chiploadMin: 0.0008,
+                    chiploadMax: 0.0012,
+                    recommendedChipload: 0.001,
+                    depthFactor: 0.2,
+                    stepoverPercent: 45,
+                    rampAngle: 2
+                },
+                '3d-finishing': {
+                    chiploadMin: 0.0006,
+                    chiploadMax: 0.001,
+                    recommendedChipload: 0.0008,
+                    depthFactor: 0.12,
+                    stepoverPercent: 8,
+                    rampAngle: 5
+                },
+                cooling: "Required - use WD-40, cutting fluid, or alcohol mist",
+                notes: "Soft and gummy - chips can weld to tool. Use sharp tools, 1-2 flute endmills. For chip welding: reduce RPM to 16-18k, increase feed rate."
+            },
+            polycarbonate: {
+                name: "Polycarbonate (Lexan)",
+                'contour-profiling': {
+                    chiploadMin: 0.002,
+                    chiploadMax: 0.0035,
+                    recommendedChipload: 0.0028,
+                    depthFactor: 0.5,
+                    stepoverPercent: 50,
+                    rampAngle: 4
+                },
+                slotting: {
+                    chiploadMin: 0.0018,
+                    chiploadMax: 0.003,
+                    recommendedChipload: 0.0024,
+                    depthFactor: 0.4,
+                    stepoverPercent: 100,
+                    rampAngle: 3
+                },
+                pocketing: {
+                    chiploadMin: 0.002,
+                    chiploadMax: 0.004,
+                    recommendedChipload: 0.003,
+                    // Flute-based depth and stepover
+                    depthFactorByFlutes: {
+                        1: 0.40,   // 30-50% range, default 40%
+                        2: 0.45,   // 30-60% range, default 45%
+                        3: 0.375,  // 25-50% range, default 37.5%
+                        4: 0.30    // 20-40% range, default 30%
+                    },
+                    stepoverPercentByFlutes: {
+                        1: 40,     // 30-50% range, default 40%
+                        2: 40,     // 30-50% range, default 40%
+                        3: 32,     // 25-40% range, default 32%
+                        4: 27      // 20-35% range, default 27%
+                    },
+                    depthFactor: 0.45,  // fallback
+                    stepoverPercent: 40,  // fallback
+                    rampAngle: 4
+                },
+                roughing: {
+                    chiploadMin: 0.0025,
+                    chiploadMax: 0.004,
+                    recommendedChipload: 0.0032,
+                    depthFactor: 0.75,
+                    stepoverPercent: 50,
+                    rampAngle: 3
+                },
+                finishing: {
+                    chiploadMin: 0.0015,
+                    chiploadMax: 0.0025,
+                    recommendedChipload: 0.002,
+                    depthFactor: 0.3,
+                    stepoverPercent: 20,
+                    rampAngle: 5
+                },
+                '3d-roughing': {
+                    chiploadMin: 0.0025,
+                    chiploadMax: 0.0035,
+                    recommendedChipload: 0.003,
+                    depthFactor: 0.5,
+                    stepoverPercent: 45,
+                    rampAngle: 3
+                },
+                '3d-finishing': {
+                    chiploadMin: 0.0015,
+                    chiploadMax: 0.0025,
+                    recommendedChipload: 0.002,
+                    depthFactor: 0.2,
+                    stepoverPercent: 10,
+                    rampAngle: 5
+                },
+                cooling: "Air blast recommended to prevent melting",
+                notes: "Can melt from heat. Use sharp tools, air cooling. Watch for stringy chips."
+            },
+            brass: {
+                name: "Brass",
+                'contour-profiling': {
+                    chiploadMin: 0.001,
+                    chiploadMax: 0.0014,
+                    recommendedChipload: 0.0011,
+                    depthFactor: 0.35,
+                    stepoverPercent: 50,
+                    rampAngle: 3
+                },
+                slotting: {
+                    chiploadMin: 0.0008,
+                    chiploadMax: 0.0012,
+                    recommendedChipload: 0.001,
+                    depthFactor: 0.3,
+                    stepoverPercent: 100,
+                    rampAngle: 2
+                },
+                pocketing: {
+                    chiploadMin: 0.001,
+                    chiploadMax: 0.0015,
+                    recommendedChipload: 0.0012,
+                    // Flute-based depth and stepover
+                    depthFactorByFlutes: {
+                        1: 0.20,   // 15-25% range, default 20%
+                        2: 0.225,  // 15-30% range, default 22.5%
+                        3: 0.15,   // 10-20% range, default 15%
+                        4: 0.10    // 5-15% range, default 10%
+                    },
+                    stepoverPercentByFlutes: {
+                        1: 20,     // 15-25% range, default 20%
+                        2: 20,     // 15-25% range, default 20%
+                        3: 15,     // 10-20% range, default 15%
+                        4: 10      // 5-15% range, default 10%
+                    },
+                    depthFactor: 0.225,  // fallback
+                    stepoverPercent: 20,  // fallback
+                    rampAngle: 3
+                },
+                roughing: {
+                    chiploadMin: 0.0012,
+                    chiploadMax: 0.0015,
+                    recommendedChipload: 0.0013,
+                    depthFactor: 0.5,
+                    stepoverPercent: 45,
+                    rampAngle: 2
+                },
+                finishing: {
+                    chiploadMin: 0.0008,
+                    chiploadMax: 0.0012,
+                    recommendedChipload: 0.001,
+                    depthFactor: 0.2,
+                    stepoverPercent: 15,
+                    rampAngle: 4
+                },
+                '3d-roughing': {
+                    chiploadMin: 0.001,
+                    chiploadMax: 0.0014,
+                    recommendedChipload: 0.0012,
+                    depthFactor: 0.4,
+                    stepoverPercent: 40,
+                    rampAngle: 2
+                },
+                '3d-finishing': {
+                    chiploadMin: 0.0008,
+                    chiploadMax: 0.0012,
+                    recommendedChipload: 0.001,
+                    depthFactor: 0.15,
+                    stepoverPercent: 10,
+                    rampAngle: 4
+                },
+                cooling: "Optional - cutting fluid extends tool life",
+                notes: "Machines well with sharp tools. Can be brittle - support thin features."
+            },
+            copper: {
+                name: "Copper",
+                'contour-profiling': {
+                    chiploadMin: 0.0008,
+                    chiploadMax: 0.0014,
+                    recommendedChipload: 0.0011,
+                    depthFactor: 0.35,
+                    stepoverPercent: 50,
+                    rampAngle: 3
+                },
+                slotting: {
+                    chiploadMin: 0.0008,
+                    chiploadMax: 0.0012,
+                    recommendedChipload: 0.001,
+                    depthFactor: 0.3,
+                    stepoverPercent: 100,
+                    rampAngle: 2
+                },
+                pocketing: {
+                    chiploadMin: 0.0008,
+                    chiploadMax: 0.0015,
+                    recommendedChipload: 0.0012,
+                    // Flute-based depth and stepover
+                    depthFactorByFlutes: {
+                        1: 0.15,   // 10-20% range, default 15%
+                        2: 0.115,  // 8-15% range, default 11.5%
+                        3: 0.075,  // 5-10% range, default 7.5%
+                        4: null    // Not recommended
+                    },
+                    stepoverPercentByFlutes: {
+                        1: 15,     // 10-20% range, default 15%
+                        2: 11.5,   // 8-15% range, default 11.5%
+                        3: 7.5,    // 5-10% range, default 7.5%
+                        4: null    // Not recommended
+                    },
+                    depthFactor: 0.115,  // fallback (2-flute)
+                    stepoverPercent: 11.5,  // fallback (2-flute)
+                    rampAngle: 3
+                },
+                roughing: {
+                    chiploadMin: 0.001,
+                    chiploadMax: 0.0015,
+                    recommendedChipload: 0.0013,
+                    depthFactor: 0.5,
+                    stepoverPercent: 45,
+                    rampAngle: 2
+                },
+                finishing: {
+                    chiploadMin: 0.0006,
+                    chiploadMax: 0.001,
+                    recommendedChipload: 0.0008,
+                    depthFactor: 0.2,
+                    stepoverPercent: 15,
+                    rampAngle: 4
+                },
+                '3d-roughing': {
+                    chiploadMin: 0.0008,
+                    chiploadMax: 0.0014,
+                    recommendedChipload: 0.0011,
+                    depthFactor: 0.4,
+                    stepoverPercent: 40,
+                    rampAngle: 2
+                },
+                '3d-finishing': {
+                    chiploadMin: 0.0006,
+                    chiploadMax: 0.001,
+                    recommendedChipload: 0.0008,
+                    depthFactor: 0.15,
+                    stepoverPercent: 10,
+                    rampAngle: 4
+                },
+                cooling: "Recommended - cutting fluid or WD-40",
+                notes: "Soft and gummy but tougher than aluminum. Good chip clearance essential."
+            },
+            mildsteel: {
+                name: "Mild Steel (1018)",
+                'contour-profiling': {
+                    chiploadMin: 0.0005,
+                    chiploadMax: 0.0009,
+                    recommendedChipload: 0.0007,
+                    depthFactor: 0.25,
+                    stepoverPercent: 50,
+                    rampAngle: 2
+                },
+                slotting: {
+                    chiploadMin: 0.0005,
+                    chiploadMax: 0.0008,
+                    recommendedChipload: 0.0006,
+                    depthFactor: 0.2,
+                    stepoverPercent: 100,
+                    rampAngle: 1.5
+                },
+                pocketing: {
+                    chiploadMin: 0.0005,
+                    chiploadMax: 0.001,
+                    recommendedChipload: 0.0008,
+                    // Flute-based depth and stepover
+                    depthFactorByFlutes: {
+                        1: 0.075,  // 5-10% range, default 7.5%
+                        2: 0.075,  // 5-10% range, default 7.5%
+                        3: null,   // Not recommended
+                        4: null    // Not recommended
+                    },
+                    stepoverPercentByFlutes: {
+                        1: 7.5,    // 5-10% range, default 7.5%
+                        2: 7.5,    // 5-10% range, default 7.5%
+                        3: null,   // Not recommended
+                        4: null    // Not recommended
+                    },
+                    depthFactor: 0.075,  // fallback
+                    stepoverPercent: 7.5,  // fallback
+                    rampAngle: 2
+                },
+                roughing: {
+                    chiploadMin: 0.0006,
+                    chiploadMax: 0.001,
+                    recommendedChipload: 0.0008,
+                    depthFactor: 0.4,
+                    stepoverPercent: 40,
+                    rampAngle: 1.5
+                },
+                finishing: {
+                    chiploadMin: 0.0004,
+                    chiploadMax: 0.0008,
+                    recommendedChipload: 0.0006,
+                    depthFactor: 0.15,
+                    stepoverPercent: 10,
+                    rampAngle: 3
+                },
+                '3d-roughing': {
+                    chiploadMin: 0.0005,
+                    chiploadMax: 0.0009,
+                    recommendedChipload: 0.0007,
+                    depthFactor: 0.3,
+                    stepoverPercent: 35,
+                    rampAngle: 1.5
+                },
+                '3d-finishing': {
+                    chiploadMin: 0.0004,
+                    chiploadMax: 0.0008,
+                    recommendedChipload: 0.0006,
+                    depthFactor: 0.12,
+                    stepoverPercent: 8,
+                    rampAngle: 3
+                },
+                cooling: "Required - cutting fluid strongly recommended",
+                notes: "Challenging on hobby CNC. Use carbide tools, proper cooling, conservative parameters."
+            }
+        };
+
+        // Update material-specific defaults when material, operation, or bit type changes
+        document.getElementById('material').addEventListener('change', updateDefaults);
+        document.getElementById('operation').addEventListener('change', updateDefaults);
+        document.getElementById('bit-type').addEventListener('change', updateDefaults);
+        document.getElementById('flutes').addEventListener('change', updateDefaults);
+
+        function updateDefaults() {
+            const material = document.getElementById('material').value;
+            const operation = document.getElementById('operation').value;
+            const bitType = document.getElementById('bit-type').value;
+            
+            // Don't update if required fields are empty
+            if (!material || !operation || !bitType) {
+                return;
+            }
+            
+            const matData = materials[material];
+            const opData = matData[operation];
+            const bitData = bitTypes[bitType];
+            
+            // Update stepover label based on operation
+            const stepoverLabel = document.getElementById('stepover-label');
+            const stepoverHelper = document.getElementById('stepover-helper');
+            
+            if (operation === 'contour-profiling') {
+                stepoverLabel.textContent = 'Width of Cut - WOC (%)';
+                stepoverHelper.textContent = 'Radial engagement - typically 50% for outside/inside profiles';
+            } else if (operation === 'slotting') {
+                stepoverLabel.textContent = 'Width of Cut - WOC (%)';
+                stepoverHelper.textContent = 'Full width engagement (100%) - most aggressive cut';
+            } else {
+                stepoverLabel.textContent = 'Stepover (%)';
+                stepoverHelper.textContent = 'How much the tool moves sideways between passes';
+            }
+            
+            // Apply bit type multipliers to base chipload
+            const adjustedChipload = opData.recommendedChipload * bitData.chiploadMultiplier;
+            document.getElementById('chipload').value = adjustedChipload.toFixed(4);
+            
+            // Get flute-based depth factor and stepover for pocketing
+            const flutes = parseInt(document.getElementById('flutes').value);
+            let depthFactor = opData.depthFactor;
+            let stepoverPercent = opData.stepoverPercent;
+            
+            if (operation === 'pocketing' && opData.depthFactorByFlutes && opData.stepoverPercentByFlutes) {
+                const fluteDepthFactor = opData.depthFactorByFlutes[flutes];
+                const fluteStepover = opData.stepoverPercentByFlutes[flutes];
+                
+                if (fluteDepthFactor !== null && fluteDepthFactor !== undefined) {
+                    depthFactor = fluteDepthFactor;
+                }
+                if (fluteStepover !== null && fluteStepover !== undefined) {
+                    stepoverPercent = fluteStepover;
+                }
+            }
+            
+            // Hide/show total depth based on operation type
+            const totalDepthContainer = document.getElementById('total-depth-container');
+            const depthStepoverContainer = document.getElementById('depth-stepover-container');
+            
+            if (operation === '3d-roughing' || operation === '3d-finishing') {
+                // Hide total depth for 3D operations
+                totalDepthContainer.style.display = 'none';
+                depthStepoverContainer.style.gridTemplateColumns = '1fr';
+            } else {
+                // Show total depth for 2D operations
+                totalDepthContainer.style.display = 'block';
+                depthStepoverContainer.style.gridTemplateColumns = '1fr 1fr';
+                
+                // Calculate recommended depth per pass based on tool diameter, depth factor, and bit type
+                const toolDiameter = parseFloat(document.getElementById('tool-diameter').value);
+                const recommendedDepthPerPass = (toolDiameter * depthFactor * bitData.depthMultiplier);
+                
+                // Set total depth as 4x the safe depth per pass for students (conservative)
+                const totalDepthInches = recommendedDepthPerPass * 4;
+                
+                // Convert to current unit
+                const currentUnit = document.getElementById('depth-unit').value;
+                if (currentUnit === 'mm') {
+                    document.getElementById('total-depth').value = (totalDepthInches * 25.4).toFixed(3);
+                } else {
+                    document.getElementById('total-depth').value = totalDepthInches.toFixed(3);
+                }
+            }
+            
+            // Set stepover
+            document.getElementById('stepover-percent').value = stepoverPercent;
+            
+            // Show helper text for roughing bits
+            const flutesHelper = document.getElementById('flutes-helper');
+            if (bitType === 'roughing') {
+                flutesHelper.innerHTML = '⚠️ For corn cob roughing bits with many serrations, use 1 flute';
+                flutesHelper.style.color = '#ff6b35';
+            } else {
+                flutesHelper.innerHTML = '';
+            }
+            
+            updateRecommendationText();
+        }
+
+        // Update recommendation text on input
+        document.getElementById('chipload').addEventListener('input', updateRecommendationText);
+        document.getElementById('tool-diameter').addEventListener('change', function() {
+            updateDefaults();
+        });
+        document.getElementById('depth-unit').addEventListener('change', function() {
+            updateDefaults();
+        });
+
+        function updateRecommendationText() {
+            const material = document.getElementById('material').value;
+            const operation = document.getElementById('operation').value;
+            const bitType = document.getElementById('bit-type').value;
+            const chiploadInput = document.getElementById('chipload').value;
+            const chipload = parseFloat(chiploadInput);
+            
+            // Clear recommendations if required fields are empty
+            const chiploadRec = document.getElementById('chipload-recommendation');
+            if (!material || !operation || !bitType) {
+                chiploadRec.innerHTML = '';
+                return;
+            }
+            
+            const matData = materials[material];
+            const opData = matData[operation];
+            const bitData = bitTypes[bitType];
+
+            // Apply bit type multipliers to ranges
+            const adjustedChiploadMin = opData.chiploadMin * bitData.chiploadMultiplier;
+            const adjustedChiploadMax = opData.chiploadMax * bitData.chiploadMultiplier;
+
+            // Convert to mm (1 inch = 25.4 mm, so multiply by 25.4)
+            const chiploadMinMM = (adjustedChiploadMin * 25.4).toFixed(4);
+            const chiploadMaxMM = (adjustedChiploadMax * 25.4).toFixed(4);
+
+            // Show recommended range
+            chiploadRec.innerHTML = `Safe range: ${adjustedChiploadMin.toFixed(4)}" - ${adjustedChiploadMax.toFixed(4)}" (${chiploadMinMM} - ${chiploadMaxMM} mm)`;
+            chiploadRec.style.color = '#888';
+            
+            // If chipload has a value, validate it
+            if (chiploadInput && !isNaN(chipload)) {
+                if (chipload < adjustedChiploadMin * 0.8) {
+                    chiploadRec.style.color = '#d32f2f';
+                    chiploadRec.innerHTML += ' <strong>(⚠️ Too low)</strong>';
+                } else if (chipload > adjustedChiploadMax * 1.2) {
+                    chiploadRec.style.color = '#d32f2f';
+                    chiploadRec.innerHTML += ' <strong>(⚠️ Too high)</strong>';
+                } else {
+                    chiploadRec.style.color = '#4caf50';
+                    chiploadRec.innerHTML += ' <strong>(✓ Good)</strong>';
+                }
+            }
+        }
+
+        function calculate() {
+            const rpm = parseFloat(document.getElementById('spindle-dial').value);
+            const material = document.getElementById('material').value;
+            const operation = document.getElementById('operation').value;
+            const bitType = document.getElementById('bit-type').value;
+            const toolDiameter = parseFloat(document.getElementById('tool-diameter').value);
+            const flutes = parseInt(document.getElementById('flutes').value);
+            const chipload = parseFloat(document.getElementById('chipload').value);
+            const plungeFactorInput = document.getElementById('plunge-factor').value;
+            const plungeFactor = plungeFactorInput ? parseFloat(plungeFactorInput) / 100 : 0.25; // Default 25%
+            
+            // Validation
+            if (!material || !operation || !bitType || isNaN(toolDiameter) || isNaN(flutes) || isNaN(chipload)) {
+                alert('Please fill in all required fields:\n- Material\n- Operation Type\n- Bit Type\n- Tool Diameter\n- Number of Flutes\n- Target Chipload');
+                return;
+            }
+
+            const matData = materials[material];
+            const opData = matData[operation];
+            const bitData = bitTypes[bitType];
+            
+            // Get flute-based stepover for pocketing, otherwise use default
+            let stepoverPercent;
+            if (operation === 'pocketing' && opData.stepoverPercentByFlutes) {
+                stepoverPercent = opData.stepoverPercentByFlutes[flutes];
+                if (stepoverPercent === null || stepoverPercent === undefined) {
+                    stepoverPercent = opData.stepoverPercent; // Fallback
+                }
+            } else {
+                stepoverPercent = opData.stepoverPercent;
+            }
+
+            // Check if this is a 3D operation
+            const is3DOperation = operation === '3d-roughing' || operation === '3d-finishing';
+            
+            let depthPerPass, numberOfPasses, totalDepth;
+            
+            if (is3DOperation) {
+                // For 3D operations, use flute-based depth factor if available
+                let depthFactor = opData.depthFactor;
+                if (opData.depthFactorByFlutes) {
+                    const fluteDepth = opData.depthFactorByFlutes[flutes];
+                    if (fluteDepth !== null && fluteDepth !== undefined) {
+                        depthFactor = fluteDepth;
+                    }
+                }
+                depthPerPass = toolDiameter * depthFactor * bitData.depthMultiplier;
+                numberOfPasses = null; // Not applicable for 3D
+                totalDepth = null;
+            } else {
+                // For 2D operations, use total depth
+                const totalDepthInput = parseFloat(document.getElementById('total-depth').value);
+                
+                if (!totalDepthInput) {
+                    alert('Please enter Total Cut Depth');
+                    return;
+                }
+                
+                const depthUnit = document.getElementById('depth-unit').value;
+                
+                // Convert total depth to inches if in mm
+                totalDepth = depthUnit === 'mm' ? totalDepthInput / 25.4 : totalDepthInput;
+                
+                // Calculate safe depth per pass using flute-based factor
+                let depthFactor = opData.depthFactor;
+                if (operation === 'pocketing' && opData.depthFactorByFlutes) {
+                    const fluteDepth = opData.depthFactorByFlutes[flutes];
+                    if (fluteDepth !== null && fluteDepth !== undefined) {
+                        depthFactor = fluteDepth;
+                    }
+                }
+                const recommendedDepthPerPass = toolDiameter * depthFactor * bitData.depthMultiplier;
+                
+                // Calculate number of passes needed (always round up for safety)
+                numberOfPasses = Math.ceil(totalDepth / recommendedDepthPerPass);
+                
+                // Calculate actual depth per pass (distribute total depth evenly)
+                depthPerPass = totalDepth / numberOfPasses;
+            }
+
+            // Calculate feed rate with bit type multiplier
+            const baseFeedRate = rpm * flutes * chipload;
+            const feedRate = baseFeedRate * bitData.feedMultiplier;
+
+            // Calculate plunge rate
+            const plungeRate = feedRate * plungeFactor;
+
+            // Calculate stepover distance
+            const stepoverDistance = toolDiameter * (stepoverPercent / 100);
+
+            // Calculate MRR
+            const mrr = feedRate * depthPerPass * stepoverDistance;
+
+            // Calculate recommended ramp distance
+            const rampAngleDeg = opData.rampAngle;
+            const rampAngleRad = rampAngleDeg * (Math.PI / 180);
+            const rampDistance = depthPerPass / Math.tan(rampAngleRad);
+
+            // Display bit info
+            let bitInfoHtml = `
+                <p><strong>Material:</strong> ${matData.name}</p>
+                <p><strong>Operation:</strong> ${operation.charAt(0).toUpperCase() + operation.slice(1).replace('-', ' ')}</p>
+                <p><strong>Bit Type:</strong> ${bitData.name}</p>
+                <p><strong>Tool:</strong> ${toolDiameter}" diameter, ${flutes} flutes | <strong>RPM:</strong> ${rpm}</p>
+                <p><strong>Chipload:</strong> ${chipload.toFixed(4)}" per tooth</p>
+            `;
+            
+            if (!is3DOperation) {
+                const depthUnit = document.getElementById('depth-unit').value;
+                const totalDepthInput = parseFloat(document.getElementById('total-depth').value);
+                const totalDepthDisplay = depthUnit === 'mm' ? 
+                    `${totalDepthInput.toFixed(3)} mm (${totalDepth.toFixed(3)}")` : 
+                    `${totalDepth.toFixed(3)}" (${(totalDepth * 25.4).toFixed(2)} mm)`;
+                bitInfoHtml += `<p><strong>Total Cut Depth:</strong> ${totalDepthDisplay}</p>`;
+            }
+            
+            bitInfoHtml += `
+                <p><strong>Cooling:</strong> ${matData.cooling}</p>
+                <p style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #2a2a2a; font-size: 0.9em; color: #888;">
+                    💡 <strong>For VCarve Pro:</strong> Use the mm values shown below each result - VCarve accepts metric units even with imperial bits.
+                </p>
+            `;
+            document.getElementById('bitInfo').innerHTML = bitInfoHtml;
+
+            // Display results
+            let resultsHtml = `
+                <div class="result-card">
+                    <h3>Feed Rate</h3>
+                    <div class="value">${feedRate.toFixed(1)}<span class="unit">in/min</span></div>
+                    <p style="font-size: 0.75em; margin-top: 5px; color: #888;">${(feedRate * 25.4).toFixed(0)} mm/min</p>
+                </div>
+                <div class="result-card">
+                    <h3>Plunge Rate</h3>
+                    <div class="value">${plungeRate.toFixed(1)}<span class="unit">in/min</span></div>
+                    <p style="font-size: 0.75em; margin-top: 5px; color: #888;">${(plungeRate * 25.4).toFixed(0)} mm/min</p>
+                </div>
+                <div class="result-card">
+                    <h3>${is3DOperation ? 'Recommended Depth per Pass' : 'Depth per Pass (DOC)'}</h3>
+                    <div class="value">${depthPerPass.toFixed(3)}<span class="unit">inches</span></div>
+                    <p style="font-size: 0.75em; margin-top: 5px; color: #888;">${(depthPerPass * 25.4).toFixed(3)} mm</p>
+            `;
+            
+            if (!is3DOperation && numberOfPasses) {
+                resultsHtml += `<p style="font-size: 0.7em; margin-top: 3px; color: #ff6b35;"><strong>${numberOfPasses} passes needed</strong></p>`;
+            }
+            
+            resultsHtml += `
+                </div>
+                <div class="result-card">
+                    <h3>Stepover</h3>
+                    <div class="value">${stepoverDistance.toFixed(4)}<span class="unit">inches</span></div>
+                    <p style="font-size: 0.75em; margin-top: 5px; color: #888;">${(stepoverDistance * 25.4).toFixed(3)} mm (${stepoverPercent}%)</p>
+                </div>
+                <div class="result-card">
+                    <h3>Ramp Distance</h3>
+                    <div class="value">${rampDistance.toFixed(3)}<span class="unit">inches</span></div>
+                    <p style="font-size: 0.75em; margin-top: 5px; color: #888;">${(rampDistance * 25.4).toFixed(2)} mm (${rampAngleDeg}° angle)</p>
+                </div>
+                <div class="result-card">
+                    <h3>Material Removal Rate</h3>
+                    <div class="value">${mrr.toFixed(4)}<span class="unit">in³/min</span></div>
+                    <p style="font-size: 0.75em; margin-top: 5px; color: #888;">${(mrr * 16387.064).toFixed(1)} mm³/min</p>
+                </div>
+            `;
+            document.getElementById('resultsGrid').innerHTML = resultsHtml;
+
+            // Warnings
+            let warningsHtml = '';
+
+            // Check if bit type is suitable for operation
+            if (!bitData.suitableOps.includes(operation)) {
+                warningsHtml += `
+                    <div class="warning">
+                        ⚠️ <strong>Bit/Operation Mismatch:</strong> ${bitData.name} is not typically recommended for ${operation}. Consider using a different bit type for optimal results.
+                    </div>
+                `;
+            }
+
+            // Aluminum-specific safety checks
+            if (material === 'aluminum6061') {
+                // DOC Safety Check: 15-25% of tool diameter cap
+                const maxSafeDOC = toolDiameter * 0.25; // 25% cap
+                const minSafeDOC = toolDiameter * 0.15; // 15% minimum for efficiency
+                
+                if (depthPerPass > maxSafeDOC) {
+                    warningsHtml += `
+                        <div class="warning">
+                            ⚠️ <strong>DOC Too Deep for Aluminum:</strong> ${depthPerPass.toFixed(3)}" exceeds safe limit of ${maxSafeDOC.toFixed(3)}" (25% of tool diameter). 
+                            <strong>Recommended: 15-25% of tool diameter (${minSafeDOC.toFixed(3)}" - ${maxSafeDOC.toFixed(3)}").</strong> Reduce depth to prevent tool breakage and chatter.
+                        </div>
+                    `;
+                }
+                
+                // Feed Rate Safety Check
+                if (feedRate > 55) {
+                    warningsHtml += `
+                        <div class="warning">
+                            ⚠️ <strong>Feed Rate Too High for Aluminum on Hobby CNC:</strong> ${feedRate.toFixed(1)} in/min exceeds safe limit of 55 in/min. 
+                            <strong>Recommended: 40-50 in/min for student use.</strong> High feeds can cause missed steps, poor surface finish, and tool deflection.
+                        </div>
+                    `;
+                } else if (feedRate >= 45 && feedRate <= 55) {
+                    warningsHtml += `
+                        <div class="info-box">
+                            ✓ <strong>Safe Feed Rate:</strong> ${feedRate.toFixed(1)} in/min is in the safe range (45-55 in/min) for aluminum on hobby CNC machines.
+                        </div>
+                    `;
+                }
+                
+                // Chipload Safety Check
+                if (chipload > 0.0016) {
+                    warningsHtml += `
+                        <div class="warning">
+                            ⚠️ <strong>Chipload Too High for Aluminum:</strong> ${chipload.toFixed(4)}" per tooth exceeds safe limit of 0.0016". 
+                            <strong>Recommended maximum: 0.0016" per tooth for hobby CNC.</strong> High chipload increases cutting forces and can break small tools.
+                        </div>
+                    `;
+                }
+            } else {
+                // Non-aluminum feed rate warnings
+                if (feedRate > 50) {
+                    warningsHtml += `
+                        <div class="warning">
+                            ⚠️ <strong>Aggressive for Hobby CNC:</strong> ${feedRate.toFixed(1)} in/min is aggressive for the Genmitsu PROVer MAX. <strong>Recommended safe range: 45-50 in/min for student use.</strong> Start conservative and work up gradually.
+                        </div>
+                    `;
+                } else if (feedRate >= 45) {
+                    warningsHtml += `
+                        <div class="info-box">
+                            ✓ <strong>Safe Feed Rate:</strong> ${feedRate.toFixed(1)} in/min is in the safe range (45-50 in/min) for hobby CNC machines.
+                        </div>
+                    `;
+                }
+            }
+
+            if (rpm > 20000 && material === 'aluminum6061') {
+                warningsHtml += `
+                    <div class="info-box">
+                        💡 <strong>RPM Tip:</strong> For aluminum, dial settings 2.5-3.5 (16,000-20,500 RPM) often work better than higher speeds.
+                    </div>
+                `;
+            }
+
+            if (toolDiameter < 0.125) {
+                warningsHtml += `
+                    <div class="warning">
+                        ⚠️ <strong>Small Tool:</strong> Tools under 1/8" are delicate. Reduce depth to 0.005-0.010" and feed rate by 25-50%.
+                    </div>
+                `;
+            }
+
+            // Keep only critical slotting warning
+            if (operation === 'slotting') {
+                warningsHtml += `
+                    <div class="warning">
+                        ⚠️ <strong>Slotting:</strong> Full width cut - highest load. MUST use cooling (WD-40/mist).
+                    </div>
+                `;
+            }
+            
+            // Add pocketing warning for tool engagement
+            if (operation === 'pocketing') {
+                // Check for incompatible flute/material combinations
+                if (material === 'copper' && flutes === 4) {
+                    warningsHtml += `
+                        <div class="warning">
+                            ❌ <strong>Not Recommended:</strong> 4-flute endmills are not recommended for copper pocketing. Use 1-3 flute tools.
+                        </div>
+                    `;
+                } else if (material === 'mildsteel' && (flutes === 3 || flutes === 4)) {
+                    warningsHtml += `
+                        <div class="warning">
+                            ❌ <strong>Router-Limit Material:</strong> Mild steel with 3-4 flutes is not recommended on hobby CNC. Use 1-2 flute tools only.
+                        </div>
+                    `;
+                } else {
+                    // Normal long tool warning
+                    warningsHtml += `
+                        <div class="info-box">
+                            ⚠️ <strong>Long Tool Warning:</strong> If tool stickout is long (>3x diameter), reduce stepover to 10% and reduce depth per pass by 50% to prevent chatter and deflection.
+                        </div>
+                    `;
+                }
+            }
+
+            if (matData.notes) {
+                warningsHtml += `
+                    <div class="info-box">
+                        💡 ${matData.notes}
+                    </div>
+                `;
+            }
+
+            document.getElementById('warnings').innerHTML = warningsHtml;
+
+            // Show results
+            document.getElementById('results').classList.add('show');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function toggleCustom() {
+            const customSection = document.getElementById('customOverride');
+            customSection.classList.toggle('show');
+        }
+
+        function customCalculate() {
+            const rpm = parseFloat(document.getElementById('custom-rpm').value);
+            const chipload = parseFloat(document.getElementById('custom-chipload').value);
+            const flutes = parseInt(document.getElementById('custom-flutes').value);
+            const depth = parseFloat(document.getElementById('custom-depth').value);
+            const stepover = parseFloat(document.getElementById('custom-stepover').value);
+
+            if (!chipload || !flutes || !depth || !stepover) {
+                alert('Please fill in all custom calculator fields');
+                return;
+            }
+
+            const material = document.getElementById('material').value;
+            const toolDiameter = parseFloat(document.getElementById('tool-diameter').value);
+            const matData = materials[material];
+
+            // Calculate feed rate
+            const feedRate = rpm * flutes * chipload;
+
+            // Calculate plunge rate (25% of feed rate)
+            const plungeRate = feedRate * 0.25;
+
+            // Calculate stepover distance
+            const stepoverDistance = toolDiameter * (stepover / 100);
+
+            // Calculate MRR
+            const mrr = feedRate * depth * stepoverDistance;
+
+            // Display bit info
+            const bitInfoHtml = `
+                <p><strong>Custom Calculation</strong></p>
+                <p><strong>Material:</strong> ${matData.name}</p>
+                <p><strong>Tool:</strong> ${toolDiameter}" diameter, ${flutes} flutes | <strong>RPM:</strong> ${rpm}</p>
+                <p><strong>Chipload:</strong> ${chipload.toFixed(4)}" per tooth (Custom)</p>
+            `;
+            document.getElementById('bitInfo').innerHTML = bitInfoHtml;
+
+            // Display results
+            const resultsHtml = `
+                <div class="result-card">
+                    <h3>Feed Rate (Calculated)</h3>
+                    <div class="value">${feedRate.toFixed(1)}<span class="unit">in/min</span></div>
+                    <p style="font-size: 0.75em; margin-top: 5px; color: #888;">${(feedRate * 25.4).toFixed(0)} mm/min</p>
+                </div>
+                <div class="result-card">
+                    <h3>Plunge Rate (Calculated)</h3>
+                    <div class="value">${plungeRate.toFixed(1)}<span class="unit">in/min</span></div>
+                    <p style="font-size: 0.75em; margin-top: 5px; color: #888;">${(plungeRate * 25.4).toFixed(0)} mm/min</p>
+                </div>
+                <div class="result-card">
+                    <h3>Depth per Pass (Your Input)</h3>
+                    <div class="value">${depth.toFixed(3)}<span class="unit">inches</span></div>
+                    <p style="font-size: 0.75em; margin-top: 5px; color: #888;">${(depth * 25.4).toFixed(3)} mm</p>
+                </div>
+                <div class="result-card">
+                    <h3>Stepover (Your Input)</h3>
+                    <div class="value">${stepover}<span class="unit">%</span></div>
+                    <p style="font-size: 0.75em; margin-top: 5px; color: #888;">${stepoverDistance.toFixed(3)} in / ${(stepoverDistance * 25.4).toFixed(3)} mm</p>
+                </div>
+            `;
+            document.getElementById('resultsGrid').innerHTML = resultsHtml;
+
+            // Warnings
+            let warningsHtml = `
+                <div class="info-box">
+                    🔄 <strong>Custom Calculation Active:</strong> Using your custom parameters.
+                </div>
+            `;
+
+            if (feedRate > 60) {
+                warningsHtml += `
+                    <div class="warning">
+                        ⚠️ <strong>High Feed Rate:</strong> ${feedRate.toFixed(1)} in/min may be too aggressive. Monitor closely.
+                    </div>
+                `;
+            }
+
+            document.getElementById('warnings').innerHTML = warningsHtml;
+
+            // Show results
+            document.getElementById('results').classList.add('show');
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // Initialize
+        updateRecommendationText();
+    </script>
+</body>
+</html>
