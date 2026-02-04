@@ -368,7 +368,6 @@ George Mason University
 ## 🙏 Acknowledgments
 
 - **George Mason University** - MIX Fabrication Lab
-- **Office of International Programs and Services (OIPS)** - Support and guidance
 - **Students and Faculty** - Feedback during development and testing
 - **CNC Machining Community** - Best practices and safety guidelines
 
